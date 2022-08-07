@@ -1,0 +1,26 @@
+name: 'Message with Webex'
+# https://actions-cool.github.io/github-action-branding/
+branding:
+  icon: 'message-square'
+  color: 'blue'
+description: 'Send message to a room with Webex'
+author: 'Bendy Zhang'
+inputs:
+  server:
+    required: true
+    description: 'The endpoint url, for example: https://xxxx.com'
+  token:
+    required: true
+    description: 'The token to post message'
+  action:
+    required: true
+    description: 'The value should be "message"'
+  room-id:
+    required: true
+    description: 'The room id which will receive the message'
+  message:
+    required: true
+    description: 'The message text which supports markdown'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
