@@ -51,38 +51,50 @@ const actionAPIs = [
         method: 'post'
     }
 ];
+function doActionToRoom(token, server, action, requestData) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const headers = { Authorization: `Bearer ${token}` };
+        const url = `${server.endsWith('/') ? server.slice(0, server.length - 1) : server}${action.url}`;
+        try {
+            const requestConfig = {
+                url,
+                method: action.method,
+                data: requestData,
+                headers
+            };
+            core.debug(`Request Details: ${JSON.stringify(requestConfig)}`);
+            const { data } = yield (0, axios_1.default)(requestConfig);
+            core.setOutput('event_id', data.id);
+        }
+        catch (error) {
+            core.warning(`Err: ${action.method} to ${action.url} with body: ${JSON.stringify(requestData)}`);
+        }
+    });
+}
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const server = core.getInput('server');
             const action = core.getInput('action');
-            const roomId = core.getInput('room-id');
+            const rooms = (core.getInput('rooms') || '')
+                .split(';')
+                .join(',')
+                .split(',')
+                .filter(item => !!item)
+                .map(item => item.trim());
             const token = core.getInput('token');
             const matchedAction = actionAPIs.find(a => a.action.toLowerCase() === (action === null || action === void 0 ? void 0 : action.toLowerCase()));
             if (!matchedAction) {
                 core.warning(`Unknown action "${action}"`);
             }
             if (matchedAction) {
-                const headers = { Authorization: `Bearer ${token}` };
-                const requestData = {
-                    roomId,
-                    markdown: core.getInput('message')
-                };
-                const url = `${server.endsWith('/') ? server.slice(0, server.length - 1) : server}${matchedAction.url}`;
-                try {
-                    const requestConfig = {
-                        url,
-                        method: matchedAction.method,
-                        data: requestData,
-                        headers
+                yield Promise.all(rooms.map((roomId) => __awaiter(this, void 0, void 0, function* () {
+                    const requestData = {
+                        roomId,
+                        markdown: core.getInput('message')
                     };
-                    core.debug(`Request Details: ${JSON.stringify(requestConfig)}`);
-                    const { data } = yield (0, axios_1.default)(requestConfig);
-                    core.setOutput('event_id', data.id);
-                }
-                catch (error) {
-                    core.warning(`Err: ${matchedAction.method} to ${url} with body: ${JSON.stringify(requestData)}`);
-                }
+                    return yield doActionToRoom(token, server, matchedAction, requestData);
+                })));
             }
         }
         catch (error) {

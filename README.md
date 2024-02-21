@@ -16,11 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send message to room
-        uses: bndynet/github-action-webex@v1
+        uses: bndynet/github-action-webex@v2
         with:
           action: message
           token: ${{ secrets.WX_TOKEN }}
           server: ${{ secrets.WX_SERVER }}
-          room-id: ${{ secrets.WX_ROOMID }}
+          rooms: ${{ secrets.WX_ROOMID }}
           message: "# PR ${{ github.event.pull_request.number }} opened"
 ```

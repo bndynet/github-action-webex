@@ -3,7 +3,7 @@ name: 'Message with Webex'
 branding:
   icon: 'message-square'
   color: 'blue'
-description: 'Send message to a room with Webex'
+description: 'Send message to rooms with Webex'
 author: 'Bendy Zhang'
 inputs:
   server:
@@ -15,12 +15,12 @@ inputs:
   action:
     required: true
     description: 'The value should be "message"'
-  room-id:
+  rooms:
     required: true
     description: 'The room id which will receive the message'
   message:
     required: true
     description: 'The message text which supports markdown'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
